@@ -1,0 +1,15 @@
+- Energy consumption per run (battery health analysis): 
+Compute instantaneous power (voltage × current) and integrate over time to estimate total energy used per run in watt-hours. 
+This gives a concrete performance metric and lets us compare efficiency across runs using run_id.
+
+ - Dive profile and phase segmentation: 
+Use depth_m over time to identify descent, steady-state depth, and ascent phases. 
+From this, compute maximum depth, average depth, descent/ascent rates, and time spent at depth.
+
+ - Voltage sag and high-load event detection: 
+Detect moments where battery_voltage_v drops sharply while battery_current_a spikes. 
+This reveals stress events on the power system and ties electrical behavior to operational activity.
+
+ - Motion intensity and anomaly detection from IMU: 
+Compute total acceleration magnitude √(ax² + ay² + az²), apply rolling statistics, and flag spikes or abnormal variance. 
+This helps identify aggressive maneuvers, instability, or impacts.
