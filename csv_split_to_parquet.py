@@ -24,12 +24,12 @@ import argparse
 import json
 import re
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional
+from typing import Dict, List, Iterable, Optional
 
 import pandas as pd
 
-# ---------- helpers ----------
 
+# ---------- helpers ----------
 
 def sanitize_filename(name: str) -> str:
     """
@@ -93,7 +93,6 @@ def build_groups_from_keywords(
 
 # ---------- core ----------
 
-
 def split_csv_to_parquet(
     csv_path: Path,
     out_dir: Path,
@@ -104,18 +103,16 @@ def split_csv_to_parquet(
 ) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # Read once. CSV is expected to be wide
-    # df = pd.read_csv(r"C:\Users\cdani\OneDrive\Documents\CSC490\sensors.csv")
-    df = pd.read_csv(
-        r"C:\Users\denni\PycharmProjects\Senior Project\Senior-Project\sensors.csv"
-    )
+    # Read once. CSV is expected to be wide 
+    df = pd.read_csv(r"C:\Users\cdani\OneDrive\Documents\CSC490\sensors.csv")
     columns = list(df.columns)
 
     # ID columns go into every output file if present.
     id_cols = keep_existing(columns, id_cols_preferred)
     if not id_cols:
         raise ValueError(
-            f"No ID columns found. Expected one of {id_cols_preferred}. CSV header: {columns}"
+            f"No ID columns found. Expected one of {id_cols_preferred}. "
+            f"CSV header: {columns}"
         )
 
     try_parse_time_cols(df, id_cols)
@@ -154,9 +151,7 @@ def split_csv_to_parquet(
 
     if groups_json:
         # Exact grouping. Most stable, least surprising.
-        groups: Dict[str, List[str]] = json.loads(
-            groups_json.read_text(encoding="utf-8")
-        )
+        groups: Dict[str, List[str]] = json.loads(groups_json.read_text(encoding="utf-8"))
         for group_name, cols in groups.items():
             write_parquet(group_name, cols)
         return
@@ -175,7 +170,6 @@ def split_csv_to_parquet(
 
 
 # ---------- CLI ----------
-
 
 def main() -> None:
     parser = argparse.ArgumentParser(
