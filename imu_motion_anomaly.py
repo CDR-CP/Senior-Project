@@ -122,52 +122,18 @@ def main():
         print()
 
     # Count anomalies per run
-    summary = con.execute(f"""
-        WITH magnitude AS (
-            SELECT
-                ax.run_id,
-                ax.timestamp_utc,
-                SQRT(
-                    ax.imu_ax_mps2 * ax.imu_ax_mps2 +
-                    ay.imu_ay_mps2 * ay.imu_ay_mps2 +
-                    az.imu_az_mps2 * az.imu_az_mps2
-                ) AS accel_mag
-            FROM read_parquet('{AX_FILE}') ax
-            JOIN read_parquet('{AY_FILE}') ay
-                ON ax.run_id = ay.run_id AND ax.seq = ay.seq
-            JOIN read_parquet('{AZ_FILE}') az
-                ON ax.run_id = az.run_id AND ax.seq = az.seq
-        ),
-        stats AS (
-            SELECT
-                run_id,
-                accel_mag,
-                AVG(accel_mag) OVER (
-                    PARTITION BY run_id
-                    ORDER BY timestamp_utc
-                    ROWS BETWEEN {ROLLING_WINDOW} PRECEDING AND CURRENT ROW
-                ) AS mean,
-                STDDEV_SAMP(accel_mag) OVER (
-                    PARTITION BY run_id
-                    ORDER BY timestamp_utc
-                    ROWS BETWEEN {ROLLING_WINDOW} PRECEDING AND CURRENT ROW
-                ) AS std
-            FROM magnitude
-        )
-        SELECT run_id, COUNT(*) AS anomaly_count
-        FROM stats
-        WHERE std > 0
-        AND ABS((accel_mag - mean) / std) >= {Z_SCORE_THRESHOLD}
-        GROUP BY run_id
-        ORDER BY run_id
-    """).fetchdf()
-
-    if summary.empty:
+    if anomalies.empty:
         print("Anomaly count per run: none")
     else:
+        summary = (
+            anomalies.groupby("run_id")
+            .size()
+            .reset_index(name="anomaly_count")
+            .sort_values("run_id")
+        )
+        
         print("Anomaly count per run:")
         print(summary.to_string(index=False))
-        # print()
 
 
 if __name__ == "__main__":
