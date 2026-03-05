@@ -1,5 +1,6 @@
 {
   "battery": [
-    "battery_voltage_v"
+    "battery_voltage_v",
+    "depth_m"
   ]
 }

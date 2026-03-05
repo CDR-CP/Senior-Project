@@ -1,0 +1,4 @@
+Update path detection to work on any machine
+Add .env (or similar for reproducibility)
+Add requirements.txt (is there a way to auto install dependencies?)
+... 

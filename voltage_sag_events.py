@@ -1,7 +1,7 @@
 import duckdb
-
-VOLTAGE_FILE = "parquet_out\\battery_voltage_v.parquet"
-CURRENT_FILE = "parquet_out\\battery_current_a.parquet"
+from pathlib import Path
+VOLTAGE_FILE = Path(__file__).parent / "parquet_out" / "battery_voltage_v.parquet"
+CURRENT_FILE = Path(__file__).parent / "parquet_out" / "battery_current_a.parquet"
 
 # Thresholds 
 VOLTAGE_DROP_THRESHOLD = -0.05    # volts 

@@ -1,6 +1,8 @@
-import duckdb
-from pathlib import Path
 import argparse
+from pathlib import Path
+
+import duckdb
+
 
 def connect():
     return duckdb.connect()

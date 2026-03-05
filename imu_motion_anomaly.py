@@ -1,8 +1,9 @@
 import duckdb
+from pathlib import Path
 
-AX_FILE = "parquet_out\\imu_ax_mps2.parquet"
-AY_FILE = "parquet_out\\imu_ay_mps2.parquet"
-AZ_FILE = "parquet_out\\imu_az_mps2.parquet"
+AX_FILE = Path(__file__).parent / "parquet_out" / "imu_ax_mps2.parquet"
+AY_FILE = Path(__file__).parent / "parquet_out" / "imu_ay_mps2.parquet"
+AZ_FILE = Path(__file__).parent / "parquet_out" / "imu_az_mps2.parquet"
 
 ROLLING_WINDOW = 10        # number of samples in rolling window
 Z_SCORE_THRESHOLD = 3.0    # spike threshold (standard deviations)

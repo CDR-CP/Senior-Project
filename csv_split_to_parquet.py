@@ -24,10 +24,9 @@ import argparse
 import json
 import re
 from pathlib import Path
-from typing import Dict, List, Iterable, Optional
+from typing import Dict, Iterable, List, Optional
 
 import pandas as pd
-
 
 # ---------- helpers ----------
 

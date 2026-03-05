@@ -1,8 +1,9 @@
 import duckdb
+from pathlib import Path
 
 # Path to parquet files
-VOLTAGE_FILE = "parquet_out\\battery_voltage_v.parquet"
-CURRENT_FILE = "parquet_out\\battery_current_a.parquet"
+VOLTAGE_FILE = Path(__file__).parent / "parquet_out" / "battery_voltage_v.parquet"
+CURRENT_FILE = Path(__file__).parent / "parquet_out" / "battery_current_a.parquet"
 
 def main():
     con = duckdb.connect()
