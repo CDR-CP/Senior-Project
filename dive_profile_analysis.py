@@ -1,7 +1,9 @@
-import duckdb
 from pathlib import Path
 
+import duckdb
+
 DEPTH_FILE = Path(__file__).parent / "parquet_out" / "depth_m.parquet"
+
 
 def main():
     con = duckdb.connect()

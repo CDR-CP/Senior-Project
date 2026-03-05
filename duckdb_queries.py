@@ -7,6 +7,7 @@ import duckdb
 def connect():
     return duckdb.connect()
 
+
 def register_data(con, parquet_path: str):
     # Create a view so you don't repeat read_parquet everywhere
     con.execute(f"""
@@ -14,24 +15,27 @@ def register_data(con, parquet_path: str):
         SELECT * FROM read_parquet('{parquet_path}');
     """)
 
+
 def max_depth(con):
     # returns a scalar
     return con.execute("SELECT MAX(depth_m) FROM telemetry;").fetchone()[0]
 
+
 def avg_voltage(con):
     return con.execute("SELECT AVG(battery_v) FROM telemetry;").fetchone()[0]
+
 
 def main():
     parser = argparse.ArgumentParser(description="Run analysis of parquet")
     parser.add_argument(
         "query",
         choices=["max_depth", "avg_voltage", "all"],
-        help="Which metric to query for"
+        help="Which metric to query for",
     )
     parser.add_argument(
         "--parquet",
         default=str(Path("data.parquet").resolve()),
-        help="Path to Parquet file"
+        help="Path to Parquet file",
     )
     args = parser.parse_args()
 
@@ -53,6 +57,7 @@ def main():
 
     finally:
         con.close()
+
 
 if __name__ == "__main__":
     main()

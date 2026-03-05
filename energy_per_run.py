@@ -1,9 +1,11 @@
-import duckdb
 from pathlib import Path
+
+import duckdb
 
 # Path to parquet files
 VOLTAGE_FILE = Path(__file__).parent / "parquet_out" / "battery_voltage_v.parquet"
 CURRENT_FILE = Path(__file__).parent / "parquet_out" / "battery_current_a.parquet"
+
 
 def main():
     con = duckdb.connect()
@@ -14,7 +16,7 @@ def main():
         SELECT timestamp_utc, seq, run_id, battery_voltage_v
         FROM read_parquet('{VOLTAGE_FILE}')
     """)
- 
+
     con.execute(f"""
         CREATE OR REPLACE VIEW current AS
         SELECT timestamp_utc, seq, run_id, battery_current_a

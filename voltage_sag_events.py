@@ -1,11 +1,14 @@
-import duckdb
 from pathlib import Path
+
+import duckdb
+
 VOLTAGE_FILE = Path(__file__).parent / "parquet_out" / "battery_voltage_v.parquet"
 CURRENT_FILE = Path(__file__).parent / "parquet_out" / "battery_current_a.parquet"
 
-# Thresholds 
-VOLTAGE_DROP_THRESHOLD = -0.05    # volts 
-CURRENT_SPIKE_THRESHOLD = 0.5     # amps increase
+# Thresholds
+VOLTAGE_DROP_THRESHOLD = -0.05  # volts
+CURRENT_SPIKE_THRESHOLD = 0.5  # amps increase
+
 
 def main():
     con = duckdb.connect()
