@@ -104,7 +104,7 @@ def split_csv_to_parquet(
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # Read once. CSV is expected to be wide 
-    df = pd.read_csv(r"C:\Users\cdani\OneDrive\Documents\CSC490\sensors.csv")
+    df = pd.read_csv(csv_path)
     columns = list(df.columns)
 
     # ID columns go into every output file if present.
