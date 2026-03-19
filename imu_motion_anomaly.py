@@ -2,9 +2,7 @@ from pathlib import Path
 
 import duckdb
 
-AX_FILE = Path(__file__).parent / "parquet_out" / "imu_ax_mps2.parquet"
-AY_FILE = Path(__file__).parent / "parquet_out" / "imu_ay_mps2.parquet"
-AZ_FILE = Path(__file__).parent / "parquet_out" / "imu_az_mps2.parquet"
+DATA_FILE = Path(__file__).parent / "parquet_out" / "data.parquet"
 
 ROLLING_WINDOW = 10  # number of samples in rolling window
 Z_SCORE_THRESHOLD = 3.0  # spike threshold (standard deviations)
@@ -13,55 +11,21 @@ Z_SCORE_THRESHOLD = 3.0  # spike threshold (standard deviations)
 def main():
     con = duckdb.connect()
 
-    # Create views
+    # Create view
     con.execute(f"""
-        CREATE OR REPLACE VIEW ax AS
+        CREATE OR REPLACE VIEW imu AS
         SELECT
             CAST(timestamp_utc AS TIMESTAMP) AS timestamp_utc,
             seq,
             run_id,
-            imu_ax_mps2
-        FROM read_parquet('{AX_FILE}')
-    """)
-
-    con.execute(f"""
-        CREATE OR REPLACE VIEW ay AS
-        SELECT
-            CAST(timestamp_utc AS TIMESTAMP) AS timestamp_utc,
-            seq,
-            run_id,
-            imu_ay_mps2
-        FROM read_parquet('{AY_FILE}')
-    """)
-
-    con.execute(f"""
-        CREATE OR REPLACE VIEW az AS
-        SELECT
-            CAST(timestamp_utc AS TIMESTAMP) AS timestamp_utc,
-            seq,
-            run_id,
+            imu_ax_mps2,
+            imu_ay_mps2,
             imu_az_mps2
-        FROM read_parquet('{AZ_FILE}')
+        FROM read_parquet('{DATA_FILE}')
     """)
 
     query = f"""
-    WITH joined AS (
-        SELECT
-            ax.run_id,
-            ax.timestamp_utc,
-            ax.seq,
-            ax.imu_ax_mps2,
-            ay.imu_ay_mps2,
-            az.imu_az_mps2
-        FROM ax
-        JOIN ay
-            ON ax.run_id = ay.run_id
-           AND ax.seq = ay.seq
-        JOIN az
-            ON ax.run_id = az.run_id
-           AND ax.seq = az.seq
-    ),
-    magnitude AS (
+    WITH magnitude AS (
         SELECT
             run_id,
             timestamp_utc,
@@ -71,7 +35,7 @@ def main():
                 imu_ay_mps2 * imu_ay_mps2 +
                 imu_az_mps2 * imu_az_mps2
             ) AS accel_mag
-        FROM joined
+        FROM imu
     ),
     rolling_stats AS (
         SELECT
@@ -131,7 +95,7 @@ def main():
             .reset_index(name="anomaly_count")
             .sort_values("run_id")
         )
-        
+
         print("Anomaly count per run:")
         print(summary.to_string(index=False))
 

@@ -2,13 +2,13 @@ from pathlib import Path
 
 import duckdb
 
-DEPTH_FILE = Path(__file__).parent / "parquet_out" / "depth_m.parquet"
+DATA_FILE = Path(__file__).parent / "parquet_out" / "data.parquet"
 
 
 def main():
     con = duckdb.connect()
 
-    # Create a view over the depth parquet
+    # Create a view over the parquet
     con.execute(f"""
         CREATE OR REPLACE VIEW depth AS
         SELECT
@@ -16,7 +16,7 @@ def main():
             seq,
             run_id,
             depth_m
-        FROM read_parquet('{DEPTH_FILE}')
+        FROM read_parquet('{DATA_FILE}')
     """)
 
     query = """

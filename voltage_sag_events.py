@@ -2,8 +2,7 @@ from pathlib import Path
 
 import duckdb
 
-VOLTAGE_FILE = Path(__file__).parent / "parquet_out" / "battery_voltage_v.parquet"
-CURRENT_FILE = Path(__file__).parent / "parquet_out" / "battery_current_a.parquet"
+DATA_FILE = Path(__file__).parent / "parquet_out" / "data.parquet"
 
 # Thresholds
 VOLTAGE_DROP_THRESHOLD = -0.05  # volts
@@ -13,41 +12,20 @@ CURRENT_SPIKE_THRESHOLD = 0.5  # amps increase
 def main():
     con = duckdb.connect()
 
-    # Create views over parquet files
+    # Create view over parquet file
     con.execute(f"""
-        CREATE OR REPLACE VIEW voltage AS
+        CREATE OR REPLACE VIEW battery AS
         SELECT
             CAST(timestamp_utc AS TIMESTAMP) AS timestamp_utc,
             seq,
             run_id,
-            battery_voltage_v
-        FROM read_parquet('{VOLTAGE_FILE}')
-    """)
-
-    con.execute(f"""
-        CREATE OR REPLACE VIEW current AS
-        SELECT
-            CAST(timestamp_utc AS TIMESTAMP) AS timestamp_utc,
-            seq,
-            run_id,
+            battery_voltage_v,
             battery_current_a
-        FROM read_parquet('{CURRENT_FILE}')
+        FROM read_parquet('{DATA_FILE}')
     """)
 
     query = f"""
-    WITH joined AS (
-        SELECT
-            v.run_id,
-            v.timestamp_utc,
-            v.seq,
-            v.battery_voltage_v,
-            c.battery_current_a
-        FROM voltage v
-        JOIN current c
-            ON v.run_id = c.run_id
-           AND v.seq = c.seq
-    ),
-    deltas AS (
+    WITH deltas AS (
         SELECT
             run_id,
             timestamp_utc,
@@ -63,7 +41,7 @@ def main():
                     PARTITION BY run_id
                     ORDER BY timestamp_utc
                 ) AS delta_current
-        FROM joined
+        FROM battery
     ),
     flagged AS (
         SELECT
