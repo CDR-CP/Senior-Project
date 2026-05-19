@@ -1,8 +1,9 @@
 from pathlib import Path
+from src.utils.paths import DEFAULT_DATA_FILE, PARQUET_DIR, RAW_DATA_DIR, CONFIG_DIR
 
 import duckdb
 
-DATA_FILE = Path(__file__).parent / "parquet_out" / "data.parquet"
+DATA_FILE = DEFAULT_DATA_FILE
 
 ROLLING_WINDOW = 10  # number of samples in rolling window
 Z_SCORE_THRESHOLD = 3.0  # spike threshold (standard deviations)
