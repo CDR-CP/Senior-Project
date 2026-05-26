@@ -20,13 +20,14 @@ Usage:
 
 import argparse
 from pathlib import Path
+from src.utils.paths import DEFAULT_DATA_FILE, PARQUET_DIR, RAW_DATA_DIR, CONFIG_DIR
 
 import duckdb
 
 # ==== Defaults ====
 ROLLING_WINDOW = 10  # samples for rolling baseline (row-based)
 CONSECUTIVE_K = 3  # consecutive samples above ceiling = sustained breach
-DEFAULT_DATA_DIR = Path(__file__).parent / "parquet_out"
+DEFAULT_DATA_DIR = PARQUET_DIR
 HUMIDITY_FILE = "humidity_pct.parquet"
 SAFE_HUMIDITY_CEILING = 70.0
 RAPID_RISE_RATE = 3.0  # % per minute rise rate threshold for flagging rapid rise events
@@ -278,3 +279,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

@@ -24,6 +24,7 @@ import argparse
 import json
 import re
 from pathlib import Path
+from src.utils.paths import DEFAULT_DATA_FILE, PARQUET_DIR, RAW_DATA_DIR, CONFIG_DIR
 from typing import Dict, List, Iterable, Optional
 
 import pandas as pd
@@ -177,7 +178,7 @@ def main() -> None:
     )
 
     parser.add_argument("csv", type=Path, help="Input CSV (Jetson-wide schema)")
-    parser.add_argument("--out", type=Path, default=Path("parquet_out"))
+    parser.add_argument("--out", type=Path, default=PARQUET_DIR)
     parser.add_argument("--mode", choices=["column", "group"], default="column")
 
     # Preferred ID columns; only the ones that exist are used.
@@ -207,3 +208,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+from src.utils.paths import DEFAULT_DATA_FILE, PARQUET_DIR, RAW_DATA_DIR, CONFIG_DIR
 
 import duckdb
 
@@ -34,7 +35,7 @@ def main():
     )
     parser.add_argument(
         "--parquet",
-        default=str(Path("data.parquet").resolve()),
+        default=str(DEFAULT_DATA_FILE),
         help="Path to Parquet file",
     )
     args = parser.parse_args()
@@ -61,3 +62,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

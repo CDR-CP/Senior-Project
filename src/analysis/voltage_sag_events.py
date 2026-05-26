@@ -1,8 +1,9 @@
 from pathlib import Path
+from src.utils.paths import DEFAULT_DATA_FILE, PARQUET_DIR, RAW_DATA_DIR, CONFIG_DIR
 
 import duckdb
 
-DATA_FILE = Path(__file__).parent / "parquet_out" / "data.parquet"
+DATA_FILE = DEFAULT_DATA_FILE
 
 # Thresholds
 VOLTAGE_DROP_THRESHOLD = -0.05  # volts
@@ -85,3 +86,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

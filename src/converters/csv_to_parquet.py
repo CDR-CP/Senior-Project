@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+from src.utils.paths import DEFAULT_DATA_FILE, PARQUET_DIR, RAW_DATA_DIR, CONFIG_DIR
 from typing import List, Iterable
 
 import pandas as pd
@@ -85,7 +86,7 @@ def main() -> None:
     parser.add_argument(
         "--out",
         type=Path,
-        default=Path("parquet_out") / "jetson_data.parquet",
+        default=PARQUET_DIR / "jetson_data.parquet",
         help="Output Parquet file path",
     )
 
@@ -116,3 +117,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
