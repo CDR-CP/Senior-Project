@@ -10,7 +10,7 @@ The autonomous submarine is currently under development. The telemetry used by t
 The current pipeline is:
 
 ```text
-synthetic telemetry / CSV input -> Parquet -> S3 -> Glue Data Catalog / Athena -> Grafana
+Synthetic telemetry / CSV input -> Parquet -> S3 -> Glue Data Catalog / Athena -> Grafana
 ```
 
 ## Documentation
@@ -34,8 +34,6 @@ Telemetry data enters the pipeline through the local data folders. The project c
 3. Add a telemetry CSV file to `data/csv/`. CSV files are automatically converted to Parquet and written to `data/parquet_out/`.
 
 After Parquet files are added, pushing the updated repository triggers the AWS processing pipeline. Once processing is complete, open or refresh the Grafana dashboard to view the updated telemetry data.
-
-Grafana connects to Athena as its data source. When a dashboard is opened or refreshed, Grafana runs SQL queries against Athena views. Those Athena views analyze the telemetry stored in S3 and return the results displayed by the dashboard panels.
 
 ---
 
@@ -75,8 +73,6 @@ Athena analytical views
 Grafana dashboards
 ```
 
-TODO: Replace with architecture diagram or pipeline graphic.
-
 ---
 
 ## Repository Structure
@@ -97,8 +93,6 @@ TODO: Replace with architecture diagram or pipeline graphic.
 `scripts/` contains runnable project scripts, such as data generation and CSV-to-Parquet conversion.
 
 `sql/` contains the Athena SQL files used to create or recreate the project's tables and views.
-
-TODO: Add missing SQL files from saved queries on AWS.
 
 `docs/` contains additional documentation, including a user guide, schema information, and query descriptions.
 
@@ -151,8 +145,11 @@ Telemetry Parquet files are stored in S3 under:
 ```text
 s3://senior-project-data-370852768002-us-east-1-an/curated/
 ```
+![S3 Bucket/Prefix Structure](docs/images/s3_bucket.png)
 
 Athena reads the Parquet data through an external table named `sensor_data`. The table metadata is stored in the Glue Data Catalog, allowing Athena to treat the files in S3 as a queryable table.
+
+![Glue Table Schema](docs/images/glue_schema.png)
 
 Main Athena database:
 
@@ -168,15 +165,13 @@ sensor_data
 
 Athena views are defined on top of `sensor_data` and are used as the query layer for Grafana panels.
 
+![Athena Queries](docs/images/athena_queries.png)
+
 Athena query results are written to:
 
 ```text
 s3://senior-project-data-370852768002-us-east-1-an/athena-results/
 ```
-
-TODO: Add screenshot of S3 bucket/prefix structure.
-
-TODO: Add screenshot of Athena table/schema.
 
 ---
 
@@ -204,15 +199,17 @@ Uses `depth_m` over time to summarize depth behavior for each run, including max
 
 Finds points where voltage drops while current increases. This is used to identify possible high-load moments in the battery data.
 
-### IMU Motion Anomaly Detection
-
-Uses acceleration data from the IMU to estimate motion intensity and flag unusually large deviations from recent motion behavior.
-
 ### Phase Segmentation
 
 Labels telemetry rows as `surface`, `descending`, `holding_depth`, or `ascending` based on depth and vertical movement rate. This supports phase-based Grafana panels such as time spent per phase and average current/voltage per phase.
 
-TODO: Add remaining SQL views, such as Z-score analysis.
+### IMU Motion Anomaly Detection
+
+Uses acceleration data from the IMU to estimate motion intensity and flag unusually large deviations from recent motion behavior.
+
+### IMU Motion Z-Score Summary
+
+Summarizes rolling acceleration z-score behavior for each run, including maximum deviation, average deviation, and high-percentile deviation values. This helps characterize overall motion variability even when no individual samples cross the anomaly threshold.
 
 ---
 
@@ -232,7 +229,7 @@ The dashboards are intended to help users:
 
 ![Telemetry Dashboard](docs/images/telemetry_dashboard.png)
 
-The dashboard provides access to telemetry generated during a run. Users can inspect battery measurements, depth, humidity, and IMU sensor outputs through both graphical and tabular views. Data can be filtered by run ID and analyzed through Grafana dashboards backed by Amazon Athena.
+The dashboard provides access to telemetry generated during a run. Users can inspect battery measurements, depth, humidity, and IMU sensor outputs through both graphical and tabular views. The dashboard is filtered by run ID, with every panel updating .
 
 Current dashboard visualizations include telemetry plots for:
 
