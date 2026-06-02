@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-jetson_csv_to_parquet.py
+csv_to_parquet.py
 
 Purpose:
 Convert a Jetson-wide CSV (one row per time tick) into a single Parquet file.
@@ -86,7 +86,7 @@ def main() -> None:
     parser.add_argument(
         "--out",
         type=Path,
-        default=PARQUET_DIR / "jetson_data.parquet",
+        default=PARQUET_DIR / "data.parquet",
         help="Output Parquet file path",
     )
 
