@@ -51,26 +51,31 @@ Updates pushed to GitHub trigger the AWS processing pipeline, which uploads tele
 
 High-level flow:
 
-```text
-Synthetic data / CSV input
-        |
-        v
-CSV-to-Parquet conversion
-        |
-        v
-Local Parquet drop folder
-        |
-        v
-AWS S3
-        |
-        v
-Glue Data Catalog / Athena external table
-        |
-        v
-Athena analytical views
-        |
-        v
-Grafana dashboards
+```mermaid
+flowchart TD
+
+    subgraph Data_Preparation["Data Preparation"]
+        A[Synthetic Data / CSV Input]
+        B[CSV-to-Parquet Conversion]
+        C[Local Parquet Drop Folder]
+    end
+
+    subgraph AWS_Cloud["AWS Cloud"]
+        D[AWS S3]
+        E[Glue Data Catalog / Athena External Table]
+        F[Athena Analytical Views]
+    end
+
+    subgraph Visualization["Visualization"]
+        G[Grafana Dashboards]
+    end
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
 ```
 
 ---
