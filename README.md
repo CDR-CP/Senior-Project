@@ -258,3 +258,9 @@ For more detailed operating instructions, see the user guide: [`docs/UserGuide.m
 * Athena views are stored SQL definitions and recompute when queried.
 * Grafana is used for visualization; analysis logic lives in Athena SQL views.
 * Deprecated DuckDB files and older scripts are retained in `archive/` for reference but are not part of the current pipeline.
+
+## References
+
+The synthetic telemetry generator was informed by published underwater robotics dataset work, especially the VAROS synthetic underwater dataset. VAROS was used as a reference for modeling realistic sensor ranges and underwater run behavior, but no VAROS data is included in this repository.
+
+Peder Georg Olofsson Zwilgmeyer, Mauhing Yip, Andreas Langeland Teigen, Rudolf Mester, and Annette Stahl. “The VAROS Synthetic Underwater Data Set: Towards Realistic Multi-Sensor Underwater Data With Ground Truth.” Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) Workshops, 2021, pp. 3722–3730.
