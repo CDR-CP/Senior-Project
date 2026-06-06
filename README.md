@@ -17,21 +17,20 @@ Synthetic telemetry / CSV input -> Parquet -> S3 -> Glue Data Catalog / Athena -
 
 Additional project documentation can be found in:
 
-* `docs/UserGuide.md`
-* `docs/schema.md`
-* `sql/`
+* [`docs/UserGuide.md`](docs/UserGuide.md)
+* [`docs/schema.md`](docs/schema.md)
+* [`sql/`](sql/)
 
 The User Guide contains instructions for operating the system, while the schema and SQL files document the structure of the telemetry data and Athena queries.
-
 ---
 
 ## How to Use
 
 Telemetry data enters the pipeline through the local data folders. The project currently supports three input paths:
 
-1. Add an existing Parquet telemetry file to `data/parquet_out/`.
-2. Generate synthetic telemetry using the provided generator. Generated runs are written to `data/parquet_out/` automatically.
-3. Add a telemetry CSV file to `data/csv/`. CSV files are automatically converted to Parquet and written to `data/parquet_out/`.
+1. Add an existing Parquet telemetry file to [`data/parquet_out/`](data/parquet_out/).
+2. Generate synthetic telemetry using the provided generator. Generated runs are written to [`data/parquet_out/`](data/parquet_out/) automatically.
+3. Add a telemetry CSV file to [`data/csv/`](data/csv/). CSV files are automatically converted to Parquet and written to [`data/parquet_out/`](data/parquet_out/).
 
 After Parquet files are added, pushing the updated repository triggers the AWS processing pipeline. Once processing is complete, open or refresh the Grafana dashboard to view the updated telemetry data.
 
@@ -43,63 +42,53 @@ This project is organized around moving submarine telemetry into AWS so it can b
 
 Telemetry files enter the project through local repository folders. CSV inputs are automatically converted into Parquet, and synthetic telemetry is generated as Parquet directly. All Parquet telemetry files are collected in:
 
-```text
-data/parquet_out/
-```
+[`data/parquet_out/`](data/parquet_out/)
+
 
 Updates pushed to GitHub trigger the AWS processing pipeline, which uploads telemetry data to the project S3 bucket. Athena reads the uploaded Parquet files through the `sensor_data` external table, and Grafana queries Athena views built on top of that table.
 
 High-level flow:
 
-```text
-Synthetic data / CSV input
-        |
-        v
-CSV-to-Parquet conversion
-        |
-        v
-Local Parquet drop folder
-        |
-        v
-AWS S3
-        |
-        v
-Glue Data Catalog / Athena external table
-        |
-        v
-Athena analytical views
-        |
-        v
-Grafana dashboards
+```mermaid
+flowchart TD
+
+    subgraph Data_Preparation["Data Preparation"]
+        A[Synthetic Data / CSV Input]
+        B[CSV-to-Parquet Conversion]
+        C[Local Parquet Drop Folder]
+    end
+
+    subgraph AWS_Cloud["AWS Cloud"]
+        D[AWS S3]
+        E[Glue Data Catalog / Athena External Table]
+        F[Athena Analytical Views]
+    end
+
+    subgraph Visualization["Visualization"]
+        G[Grafana Dashboards]
+    end
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
 ```
 
 ---
 
 ## Repository Structure
 
-```text
-.
-├── archive/
-├── config/
-├── data/
-├── docs/
-├── scripts/
-├── sql/
-├── src/
-├── README.md
-└── pyproject.toml
-```
-
-`scripts/` contains runnable project scripts, such as data generation and CSV-to-Parquet conversion.
-
-`sql/` contains the Athena SQL files used to create or recreate the project's tables and views.
-
-`docs/` contains additional documentation, including a user guide, schema information, and query descriptions.
-
-`data/` contains the Parquet telemetry files that are uploaded to the S3 bucket and queried through Athena.
-
-`archive/` contains older or deprecated files that were part of previous versions of the project, such as the original DuckDB workflow and earlier CSV/Parquet conversion scripts.
-
+- [`archive/`](archive/) – Archived and deprecated files from earlier versions of the project.
+- [`config/`](config/) – Configuration files used throughout the pipeline.
+- [`data/`](data/) – Telemetry datasets, CSV inputs, and generated Parquet outputs.
+- [`docs/`](docs/) – User guides, schema documentation, and project documentation.
+- [`scripts/`](scripts/) – Utility scripts including telemetry generation and data conversion.
+- [`sql/`](sql/) – Athena table and view definitions.
+- [`src/`](src/) – Main project source code.
+- [`README.md`](README.md) – Project overview and setup instructions.
+- [`pyproject.toml`](pyproject.toml) – Python project configuration and dependencies.
 ---
 
 ## Data Model / Schema
@@ -128,11 +117,7 @@ Main sensor columns include:
 * `imu_ay_mps2`
 * `imu_az_mps2`
 
-For the full schema, see:
-
-```text
-docs/schema.md
-```
+For the full schema, see [`docs/schema.md`](docs/schema.md).
 
 ---
 
@@ -179,11 +164,7 @@ s3://senior-project-data-370852768002-us-east-1-an/athena-results/
 
 The project stores Athena SQL definitions in the repository so the views can be recreated if needed. This prevents the query logic from existing only inside the AWS console.
 
-The SQL files are located in:
-
-```text
-sql/
-```
+The SQL files are located in [`sql/`](sql/).
 
 The main Athena views include:
 
@@ -229,7 +210,7 @@ The dashboards are intended to help users:
 
 ![Telemetry Dashboard](docs/images/telemetry_dashboard.png)
 
-The dashboard provides access to telemetry generated during a run. Users can inspect battery measurements, depth, humidity, and IMU sensor outputs through both graphical and tabular views. The dashboard is filtered by run ID, with every panel updating .
+The dashboard provides access to telemetry generated during a run. Users can inspect battery measurements, depth, humidity, and IMU sensor outputs through both graphical and tabular views. The dashboard is filtered by run ID, with every panel updating.
 
 Current dashboard visualizations include telemetry plots for:
 
@@ -256,25 +237,18 @@ The current dashboards operate on synthetic telemetry data generated from expect
 
 ## How to Reproduce
 
-Start by adding telemetry data using one of the three accepted input paths described above. Once Parquet files are available in `data/parquet_out/`, the AWS processing pipeline uploads them to the S3 `curated/` prefix.
+Start by adding telemetry data using one of the three accepted input paths described above. Once Parquet files are available in [`data/parquet_out/`](data/parquet_out/), the AWS processing pipeline uploads them to the S3 `curated/` prefix.
 
-Create the main Athena external table by running:
+Create the main Athena external table by running [`sql/make_sensor_data.sql`](sql/make_sensor_data.sql).
 
-```text
-sql/make_sensor_data.sql
-```
 
 This creates the `sensor_data` table over the Parquet telemetry files stored in S3.
 
-After `sensor_data` exists, run the remaining SQL files in `sql/` to create or recreate the Athena views.
+After `sensor_data` exists, run the remaining SQL files in [`sql/`](sql/) to create or recreate the Athena views.
 
 Open or refresh the Grafana dashboard. Grafana must already be connected to Athena as a data source. Once connected, it queries the Athena views and displays the updated telemetry analysis.
 
-For more detailed operating instructions, see the user guide:
-
-```text
-docs/UserGuide.md
-```
+For more detailed operating instructions, see the user guide: [`docs/UserGuide.md`](docs/UserGuide.md).
 
 ---
 
